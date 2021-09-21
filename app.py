@@ -2,7 +2,7 @@ from flask import Flask, render_template, flash, request, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.utils import secure_filename
-from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import os
 
 app = Flask(__name__)
@@ -22,7 +22,7 @@ login_manager.init_app(app)
 
 login_manager.login_view = "login"
 
-from models import User
+from models import User, StoreJSON
 from forms import LoginForm, RegistrationForm, UploadFile
 
 
@@ -35,6 +35,14 @@ def index():
         mimetype = json_file.mimetype
         if not filename or not mimetype:
             return 'Bad upload!', 400
+        new_cert = StoreJSON(
+            json_file=json_file.read(),
+            mimetype=mimetype,
+            user_id=current_user.id
+        )
+        db.session.add(new_cert)
+        db.session.commit()
+        flash('File Uploaded', 'success')
     return render_template('index.html', form=form)
 
 

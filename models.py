@@ -28,3 +28,16 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+
+class StoreJSON(db.Model):
+    __tablename__ = 'store_json'
+    id = db.Column(db.Integer, primary_key=True)
+    json_file = db.Column(db.Text)
+    mimetype = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __init__(self, json_file, mimetype, user_id):
+        self.json_file = json_file
+        self.mimetype = mimetype
+        self.user_id = user_id
